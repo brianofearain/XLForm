@@ -1,4 +1,4 @@
-//
+
 //  XLFormRowDescriptor.m
 //  XLForm ( https://github.com/xmartlabs/XLForm )
 //
@@ -43,6 +43,8 @@
 -(void)hideFormRow:(XLFormRowDescriptor*)formRow;
 
 @end
+
+#import "NSObject+XLFormAdditions.h"
 
 @interface XLFormRowDescriptor() <NSCopying>
 
@@ -156,6 +158,43 @@
     return _cellConfigAtConfigure;
 }
 
+
+-(NSString*)editTextValue
+{
+    if (self.value) {
+        if (self.valueFormatter) {
+            if (self.useValueFormatterDuringInput) {
+                return [self displayTextValue];
+            }else{
+                // have formatter, but we don't want to use it during editing
+                return [self.value displayText];
+            }
+        }else{
+            // have value, but no formatter, use the value's displayText
+            return [self.value displayText];
+        }
+    }else{
+        // placeholder
+        return @"";
+    }
+}
+
+-(NSString*)displayTextValue
+{
+    if (self.value) {
+        if (self.valueFormatter) {
+            return [self.valueFormatter stringForObjectValue:self.value];
+        }
+        else{
+            return [self.value displayText];
+        }
+    }
+    else {
+        return self.noValueDisplayText;
+    }
+}
+
+
 -(NSString *)description
 {
     return self.tag;  // [NSString stringWithFormat:@"%@ - %@ (%@)", [super description], self.tag, self.rowType];
@@ -187,22 +226,22 @@
     rowDescriptorCopy.required = self.isRequired;
     rowDescriptorCopy.isDirtyDisablePredicateCache = YES;
     rowDescriptorCopy.isDirtyHidePredicateCache = YES;
-
+    
     // =====================
     // properties for Button
     // =====================
     rowDescriptorCopy.action = [self.action copy];
-
-
+    
+    
     // ===========================
     // property used for Selectors
     // ===========================
-
+    
     rowDescriptorCopy.noValueDisplayText = [self.noValueDisplayText copy];
     rowDescriptorCopy.selectorTitle = [self.selectorTitle copy];
     rowDescriptorCopy.selectorOptions = [self.selectorOptions copy];
     rowDescriptorCopy.leftRightSelectorLeftOptionSelected = [self.leftRightSelectorLeftOptionSelected copy];
-
+    
     return rowDescriptorCopy;
 }
 
@@ -268,7 +307,7 @@
     if ([_disabled isKindOfClass:[NSPredicate class]]){
         [self.sectionDescriptor.formDescriptor addObserversOfObject:self predicateType:XLPredicateTypeDisabled];
     }
-
+    
     [self evaluateIsDisabled];
 }
 
@@ -384,7 +423,7 @@
 {
     if (validator == nil || ![validator conformsToProtocol:@protocol(XLFormValidatorProtocol)])
         return;
-
+    
     if(![self.validators containsObject:validator]) {
         [self.validators addObject:validator];
     }
@@ -394,7 +433,7 @@
 {
     if (validator == nil|| ![validator conformsToProtocol:@protocol(XLFormValidatorProtocol)])
         return;
-
+    
     if ([self.validators containsObject:validator]) {
         [self.validators removeObject:validator];
     }
@@ -408,7 +447,7 @@
 -(XLFormValidationStatus *)doValidation
 {
     XLFormValidationStatus *valStatus = nil;
-
+    
     if (self.required) {
         // do required validation here
         if ([self valueIsEmpty]) {
@@ -420,13 +459,13 @@
                 // default message for required msg
                 msg = NSLocalizedString(@"%@ can't be empty", nil);
             }
-
+            
             if (self.title != nil) {
                 valStatus.msg = [NSString stringWithFormat:msg, self.title];
             } else {
                 valStatus.msg = [NSString stringWithFormat:msg, self.tag];
             }
-
+            
             return valStatus;
         }
     }

@@ -55,6 +55,16 @@ typedef void(^XLOnChangeBlock)(id __nullable oldValue,id __nullable newValue,XLF
 
 @property (copy, nullable) XLOnChangeBlock onChangeBlock;
 
+@property BOOL useValueFormatterDuringInput;
+@property (nullable) NSFormatter *valueFormatter;
+
+// returns the display text for the row descriptor, taking into account NSFormatters and default placeholder values
+- (nonnull NSString *) displayTextValue;
+
+// returns the editing text value for the row descriptor, taking into account NSFormatters.
+-(nonnull NSString *) editTextValue;
+
+
 @property (nonatomic, readonly, nonnull) NSMutableDictionary * cellConfig;
 @property (nonatomic, readonly, nonnull) NSMutableDictionary * cellConfigIfDisabled;
 @property (nonatomic, readonly, nonnull) NSMutableDictionary * cellConfigAtConfigure;
@@ -115,8 +125,8 @@ typedef void(^XLOnChangeBlock)(id __nullable oldValue,id __nullable newValue,XLF
 
 
 +(nonnull XLFormLeftRightSelectorOption *)formLeftRightSelectorOptionWithLeftValue:(nonnull id)leftValue
-                                                          httpParameterKey:(null_unspecified NSString *)httpParameterKey
-                                                              rightOptions:(nonnull NSArray *)rightOptions;
+                                                                  httpParameterKey:(null_unspecified NSString *)httpParameterKey
+                                                                      rightOptions:(nonnull NSArray *)rightOptions;
 
 
 @end
